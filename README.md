@@ -39,7 +39,7 @@ netmap.pingSweep(hosts, (results) => {
     { "host": "192.168.1.1", "delta": 18, "live": true },
     { "host": "192.168.1.254", "delta": 2002, "live": false }
   ],
-  "meta": {...}
+  "meta": {}
 }
 ```
 
@@ -95,7 +95,7 @@ netmap.tcpScan(hosts, ports, (results) => {
       ]
     }
   ],
-  "meta": {...}
+  "meta": {}
 }
 ```
 
