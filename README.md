@@ -28,7 +28,7 @@ import NetMap from 'netmap'
 const netmap = new NetMap()
 const hosts = ['192.168.0.1', '192.168.0.254', '192.168.1.1', '192.168.1.254']
 
-netmap.pingSweep(hosts, (results) => {
+netmap.pingSweep(hosts, results => {
   console.log(results)
 })
 ```
@@ -58,7 +58,7 @@ const netmap = new NetMap()
 const hosts = ['192.168.1.1', '192.168.99.100', 'google.co.uk']
 const ports = [80, 443, 8000, 8080, 27017]
 
-netmap.tcpScan(hosts, ports, (results) => {
+netmap.tcpScan(hosts, ports, results => {
   console.log(results)
 })
 ```
@@ -174,7 +174,7 @@ The method takes the follow parameters:
   * the `port` to scan (default to a random high port in the range `10000-20000`)
 
 ```javascript
-netmap.pingSweep(['192.168.1.1'], (results) => {
+netmap.pingSweep(['192.168.1.1'], results => {
   console.log(results)
 }, {
   maxConnections: 5,
@@ -196,11 +196,11 @@ The method takes the following parameters:
   * `portCallback` - a callback to execute when an individual `host:port` combination has finished scanning
 
 ```javascript
-netmap.tcpScan(['192.168.1.1'], [80, 27017], (results) => {
+netmap.tcpScan(['192.168.1.1'], [80, 27017], results => {
   console.log(results)
 }, {
   maxConnections: 5,
-  portCallback: (result) => {
+  portCallback: result => {
     console.log(result)
   }
 })
