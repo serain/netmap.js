@@ -127,3 +127,52 @@ test('pingSweep() returns a promise and a result', () => {
     expect(results).toBeDefined()
   })
 })
+
+test('pingSweep() results contain hosts', () => {
+  expect.assertions(1)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.2', port: 80, delta: 1})
+
+  const netmap = new NetMap({timeout: 1})
+  netmap.checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.pingSweep(['192.168.1.1', '192.168.1.2']).then(results => {
+    expect(results.hosts).toBeDefined()
+  })
+})
+
+test('pingSweep() results hosts contain expected parameters', () => {
+  expect.assertions(3)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.2', port: 80, delta: 1})
+
+  const netmap = new NetMap({timeout: 1})
+  netmap.checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.pingSweep(['192.168.1.1', '192.168.1.2']).then(results => {
+    expect(results.hosts[0].host).toBeDefined()
+    expect(results.hosts[0].live).toBeDefined()
+    expect(results.hosts[0].delta).toBeDefined()
+  })
+})
+
+test('pingSweep() marks hosts that timeout as offline', () => {
+  expect.assertions(1)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.2', port: 80, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.3', port: 80, delta: 20})
+
+  const netmap = new NetMap({timeout: 20})
+  netmap.checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.pingSweep(['192.168.1.1', '192.168.1.2']).then(results => {
+    const liveHosts = results.hosts.filter(entry => entry.live)
+    expect(liveHosts.length).toEqual(2)
+  })
+})
