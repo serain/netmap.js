@@ -212,7 +212,7 @@ This section briefly covers the theory behind the module's discovery techniques.
 
 ### The General Idea
 
-This module uses `Image` objects to try to request cross-origin resources (the series of `http://{host}:{port}` URLs under test). The time it takes for the browser to raise an error (the `delta`), or the lack of error after a certain timeout value, provides insights into the state of host and port under review.
+This module uses `Image` objects to try to request cross-origin resources (the series of `http://{host}:{port}` URLs under test). The time it takes for the browser to raise an error (the `delta`), or the lack of error after a certain timeout value, provides insights into the state of the host and port under review.
 
 #### Standard Case
 
