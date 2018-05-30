@@ -8,7 +8,7 @@ Fast browser-based network discovery module
 
 ## Motivation
 
-I needed a browser-based port scanner for an idea I was working on. I thought it would be a simple matter of importing an existing module or copy-pasting from another project like BeEF.
+I needed a browser-based port scanner for an idea I was working on. I thought it would be a simple matter of importing an existing module or copy-pasting from another project like [BeEF](http://beefproject.com/).
 
 Turns out there wasn't a decent ready-to-use `npm` module and the [`port_scanner`](https://github.com/beefproject/beef/blob/master/modules/network/port_scanner/command.js) module in BeEF is (at the time of writing) inaccurate, slow and doesn't work on Chromium.
 
@@ -133,7 +133,7 @@ However, due to the implementation this won't work when TCP `RST` packets are no
 * Some external hosts
 * Some network setups like bridged/host-only VMs
 
-The reason behind this is explained in `The Theory` section below.
+The reason behind this is explained in [The Theory](#the-theory) section below.
 
 This limitation doesn't affect the TCP scanning capabilities and it's still possible to determine if the above hosts are live by trying to find an open port on them.
 
