@@ -16,7 +16,13 @@ Turns out there wasn't a decent ready-to-use `npm` module and the [`port_scanner
 
 `netmap.js` is therefor a somewhat optimized "ping" sweeper and TCP scanner that works on all modern browsers.
 
-## Examples
+## Quickstart
+
+### Install
+
+```shell
+npm install --save-dev netmap.js
+```
 
 ### Find Live Hosts
 
@@ -47,7 +53,7 @@ netmap.pingSweep(hosts).then(results => {
 
 Host `192.168.1.1` appears to be live.
 
-### TCP Port Scan
+### Scan TCP Ports
 
 Let's try to find some open TCP ports on a few hosts:
 
