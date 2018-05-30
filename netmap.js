@@ -2,7 +2,7 @@ import PromisePool from 'es6-promise-pool'
 
 export default class NetMap {
   constructor ({timeout, portTimeout, protocol} = {}) {
-    this.timeout = timeout || 2000
+    this.timeout = timeout || 1000
     this.portTimeout = portTimeout || 1000
     this.protocol = protocol || 'http'
   }
