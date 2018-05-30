@@ -139,7 +139,7 @@ This limitation doesn't affect the TCP scanning capabilities and it's still poss
 
 ### General Lack of Accuracy
 
-Overall, I've found this module to be more accurate and faster than the other bits of code I found laying around the web. However, the whole idea of mapping networks from a browser is going to be fidgety by nature. Your mileage may vary.
+Overall, I've found this module to be more accurate and faster than the other bits of code I found laying around the web. That being said, the whole idea of mapping networks from a browser is going to be fidgety by nature. Your mileage may vary.
 
 ## Usage
 
