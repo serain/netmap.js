@@ -1,4 +1,4 @@
-# netmap.js [![npm version](https://badge.fury.io/js/netmap.js.svg)](https://badge.fury.io/js/netmap.js) [![travis](https://travis-ci.org/serain/netmap.js.svg?branch=master)](https://travis-ci.org/serain/netmap.js.svg?branch=master)
+# netmap.js [![](https://img.shields.io/npm/v/netmap.js.svg)](https://www.npmjs.com/package/netmap.js) [![](https://img.shields.io/travis/serain/netmap.js.svg)](https://travis-ci.org/serain/netmap.js.svg?branch=master) [![](https://img.shields.io/codecov/c/github/serain/netmap.js.svg)](https://codecov.io/gh/serain/netmap.js)
 
 Fast browser-based network discovery module
 
