@@ -6,6 +6,8 @@ Fast browser-based network discovery module
 
 `netmap.js` provides browser-based host discovery and port scanning capabilities to allow you to map website visitors' networks.
 
+It's quite fast, making use of [`es6-promise-pool`](https://github.com/timdp/es6-promise-pool) to efficiently run the maximum number of concurrent connections browsers will allow.
+
 ## Motivation
 
 I needed a browser-based port scanner for an idea I was working on. I thought it would be a simple matter of importing an existing module or copy-pasting from another project like [BeEF](http://beefproject.com/).
@@ -190,7 +192,7 @@ The method takes the following parameters:
 * `ports` list of ports to scan (integers between 1-65535, avoid ports in the [blacklists](#port-blacklists))
 * `callback(results)` to execute on completion
 * `options` object with:
-  * `maxConnections` - the maximum number of concurrent connections (by default `10` on Chrome and `17` on other browsers - the maximum concurrent connections supported by the browsers)
+  * `maxConnections` - the maximum number of concurrent connections (by default `6` - the maximum connections per domain browsers will allow)
   * `portCallback` - a callback to execute when an individual `host:port` combination has finished scanning
 
 ```javascript
