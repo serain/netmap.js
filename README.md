@@ -105,7 +105,7 @@ You'll notice that `netmap.js` doesn't try to tell us if a port is open or close
 
 At first the results may seem contradictory.
 
-`192.168.1.1` is a physical machine on the local network segment, and the only port open is `80`. We can see that it took the browser about 5 times longer to error out on `80` compared to the other, closed, ports.
+`192.168.1.1` is an embedded Linux machine (a router) on the local network segment, and the only port open is `80`. We can see that it took the browser about 5 times longer to error out on `80` compared to the other, closed, ports.
 
 `192.168.99.100` is a host-only VM with port `8080` open and `google.co.uk` is an external host with both `443` and `80` open. In this case the browser threw an error relatively rapidly on the open ports while the closed ports simply timed out. [The Theory](#the-theory) section further down explains when this happens.
 
@@ -127,7 +127,7 @@ Sub-resource requests from "legacy" protocols like `ftp` are blocked in Chromium
 
 ### "Ping" Sweep
 
-The "ping" sweep method provided by `netmap.js` does a pretty good job at quickly finding live physical hosts on a local network segment (other computers, routers, printers etc.)
+The "ping" sweep functionality provided by `netmap.js` does a pretty good job at quickly finding live *nix-based hosts on a local network segment (other computers, phones, routers, printers etc.)
 
 However, due to the implementation this won't work when TCP `RST` packets are not returned. Typically:
 
