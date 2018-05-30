@@ -40,3 +40,19 @@ test('NetMap timeout parameter works', () => {
     expect(result.delta).toBeLessThan(600)
   })
 })
+
+test('tcpScan() returns a promise and a result', () => {
+  expect.assertions(1)
+  const netmap = new NetMap({timeout: 1})
+  return netmap.tcpScan(['localhost'], [443]).then(results => {
+    expect(results).toBeDefined()
+  })
+})
+
+test('pingSweep() returns a promise and a result', () => {
+  expect.assertions(1)
+  const netmap = new NetMap({timeout: 1})
+  return netmap.pingSweep(['localhost']).then(results => {
+    expect(results).toBeDefined()
+  })
+})

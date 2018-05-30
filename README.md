@@ -28,7 +28,7 @@ import NetMap from 'netmap'
 const netmap = new NetMap()
 const hosts = ['192.168.0.1', '192.168.0.254', '192.168.1.1', '192.168.1.254']
 
-netmap.pingSweep(hosts, results => {
+netmap.pingSweep(hosts).then(results => {
   console.log(results)
 })
 ```
@@ -58,7 +58,7 @@ const netmap = new NetMap()
 const hosts = ['192.168.1.1', '192.168.99.100', 'google.co.uk']
 const ports = [80, 443, 8000, 8080, 27017]
 
-netmap.tcpScan(hosts, ports, results => {
+netmap.tcpScan(hosts, ports).then(results => {
   console.log(results)
 })
 ```
@@ -165,20 +165,21 @@ const netmap = new NetMap({
 
 The `pingSweep()` method determines if a given array of hosts are live. It does this by checking if connection to a port times out, in which case a host is considered offline (see ["Ping" Sweep](#ping-sweep) for limitations and [Standard Case](#standard-case) for the theory).
 
-The method takes the follow parameters:
+The method takes the following parameters:
 
 * `hosts` array of hosts to scan (IP addresses or host names)
-* `callback(results)` to execute on completion
 * `options` object with:
   * `maxConnections` - the maximum number of concurrent connections (by default `10` on Chrome and `17` on other browsers - the maximum concurrent connections supported by the browsers)
   * the `port` to scan (default to a random high port in the range `10000-20000`)
 
+It returns a promise.
+
 ```javascript
-netmap.pingSweep(['192.168.1.1'], results => {
-  console.log(results)
-}, {
+netmap.pingSweep(['192.168.1.1'], {
   maxConnections: 5,
   port: 80
+}).then(results => {
+  console.log(results)
 })
 ```
 
@@ -195,14 +196,16 @@ The method takes the following parameters:
   * `maxConnections` - the maximum number of concurrent connections (by default `6` - the maximum connections per domain browsers will allow)
   * `portCallback` - a callback to execute when an individual `host:port` combination has finished scanning
 
+It returns a promise.
+
 ```javascript
-netmap.tcpScan(['192.168.1.1'], [80, 27017], results => {
-  console.log(results)
-}, {
+netmap.tcpScan(['192.168.1.1'], [80, 27017], {
   maxConnections: 5,
   portCallback: result => {
     console.log(result)
   }
+}).then(results => {
+  console.log(results)
 })
 ```
 
