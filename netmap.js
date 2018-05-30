@@ -100,7 +100,7 @@ export default class NetMap {
   }
 
   checkPort (self, host, port) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       const start = (new Date()).getTime()
       let interval
 
