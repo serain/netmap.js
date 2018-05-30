@@ -14,7 +14,7 @@ I needed a browser-based port scanner for an idea I was working on. I thought it
 
 Turns out there wasn't a decent ready-to-use `npm` module and the [`port_scanner`](https://github.com/beefproject/beef/blob/master/modules/network/port_scanner/command.js) module in BeEF is (at the time of writing) inaccurate, slow and doesn't work on Chromium.
 
-`netmap.js` is therefor a somewhat-optimized "ping" sweeper and TCP scanner that works on all modern browsers.
+`netmap.js` is therefor a somewhat optimized "ping" sweeper and TCP scanner that works on all modern browsers.
 
 ## Examples
 
