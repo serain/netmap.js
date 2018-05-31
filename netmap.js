@@ -12,18 +12,20 @@ export default class NetMap {
       // best estimate for maxConnections based on
       // https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser
       // which may not be up-to-date or accurate
+      port = port || 45000
       maxConnections = maxConnections || (function () {
         if (window.chrome) return 10
         else return 17
       })()
 
-      port = port || 45000
-
       const results = {
         hosts: []
       }
 
-      this.tcpScan(hosts, [port], {maxConnections: maxConnections})
+      this.tcpScan(hosts, [port], {
+        maxConnections: maxConnections,
+        controlPorts: []
+      })
         .then(tcpResults => {
           results.meta = tcpResults.meta
 
@@ -46,18 +48,20 @@ export default class NetMap {
     })
   }
 
-  tcpScan (hosts, ports, {portCallback, maxConnections} = {}) {
+  tcpScan (hosts, ports, {portCallback, maxConnections, controlPorts} = {}) {
     return new Promise((resolve, reject) => {
       // best estimate for maxConnections based on
       // https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser
       // which may not be up-to-date or accurate
       maxConnections = maxConnections || 6
+      controlPorts = controlPorts || [45000, 45001, 45002]
       const self = this
       const results = {
         meta: {
           hosts: hosts,
           ports: ports,
           maxConnections: maxConnections,
+          controlPorts: controlPorts,
           startTime: (new Date()).getTime()
         },
         hosts: (function () {
@@ -87,7 +91,8 @@ export default class NetMap {
 
         result.ports.push({
           port: event.data.result.port,
-          delta: event.data.result.delta
+          delta: event.data.result.delta,
+          open: undefined
         })
 
         if (portCallback) portCallback(event.data.result)
