@@ -1,9 +1,8 @@
 import PromisePool from 'es6-promise-pool'
 
 export default class NetMap {
-  constructor ({timeout, portTimeout, protocol} = {}) {
+  constructor ({timeout, protocol} = {}) {
     this.timeout = timeout || 1000
-    this.portTimeout = portTimeout || 1000
     this.protocol = protocol || 'http'
   }
 
@@ -55,7 +54,7 @@ export default class NetMap {
       // which may not be up-to-date or accurate
       maxConnections = maxConnections || 6
       controlPorts = controlPorts || [45000, 45001, 45002]
-      const self = this
+      ports = ports.concat(controlPorts)
       const results = {
         meta: {
           hosts: hosts,
@@ -76,10 +75,14 @@ export default class NetMap {
         })()
       }
 
+      const self = this
       const pool = new PromisePool(function * () {
         for (let i = 0; i < hosts.length; i++) {
           for (let j = 0; j < ports.length; j++) {
-            yield self.checkPort(self, hosts[i], ports[j])
+            yield self._checkPort(hosts[i], ports[j], {
+              timeout: self.timeout,
+              protocol: self.protocol
+            })
           }
         }
       }, maxConnections)
@@ -106,17 +109,19 @@ export default class NetMap {
     })
   }
 
-  checkPort (self, host, port) {
+  _checkPort (host, port, {timeout, protocol} = {}) {
     return new Promise((resolve, reject) => {
+      timeout = timeout || 1000
+      protocol = protocol || 'http'
       const start = (new Date()).getTime()
       let interval
 
       const img = new Image()
-      img.src = self.protocol + '://' + host + ':' + port
+      img.src = protocol + '://' + host + ':' + port
       img.onerror = function () {
         let delta = (new Date()).getTime() - start
 
-        if (delta < self.portTimeout) {
+        if (delta < timeout) {
           clearInterval(interval)
           img.src = ''
           resolve({
@@ -131,7 +136,7 @@ export default class NetMap {
       interval = setInterval(function () {
         var delta = (new Date()).getTime() - start
 
-        if (delta >= self.timeout) {
+        if (delta >= timeout) {
           if (!img) return
           img.src = ''
           clearInterval(interval)
