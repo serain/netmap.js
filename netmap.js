@@ -17,10 +17,7 @@ export default class NetMap {
         else return 17
       })()
 
-      port = port || (function () {
-        // get a random high port
-        return Math.floor(Math.random() * 10000) + 10000
-      })()
+      port = port || 45000
 
       const results = {
         hosts: []

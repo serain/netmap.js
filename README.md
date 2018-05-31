@@ -176,7 +176,7 @@ The method takes the following parameters:
 * `hosts` array of hosts to scan (IP addresses or host names)
 * `options` object with:
   * `maxConnections` - the maximum number of concurrent connections (by default `10` on Chrome and `17` on other browsers - the maximum concurrent connections supported by the browsers)
-  * the `port` to scan (default to a random high port in the range `10000-10000`)
+  * the `port` to scan (default `45000`)
 
 It returns a promise.
 

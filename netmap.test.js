@@ -128,8 +128,8 @@ test('pingSweep() returns a promise and a result', () => {
   })
 })
 
-test('pingSweep() results contain hosts', () => {
-  expect.assertions(1)
+test('pingSweep() results contain hosts and meta', () => {
+  expect.assertions(2)
 
   const portResults = jest.fn()
   portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
@@ -140,6 +140,21 @@ test('pingSweep() results contain hosts', () => {
 
   return netmap.pingSweep(['192.168.1.1', '192.168.1.2']).then(results => {
     expect(results.hosts).toBeDefined()
+    expect(results.meta).toBeDefined()
+  })
+})
+
+test('pingSweep() default port set to 45000', () => {
+  expect.assertions(1)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
+
+  const netmap = new NetMap({timeout: 1})
+  netmap.checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.pingSweep(['192.168.1.1']).then(results => {
+    expect(results.meta.ports).toEqual([45000])
   })
 })
 
