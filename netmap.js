@@ -109,6 +109,42 @@ export default class NetMap {
     })
   }
 
+  _scan (hosts, ports, {portCallback, maxConnections} = {}) {
+    return new Promise((resolve, reject) => {
+      maxConnections = maxConnections || 6
+      const results = hosts.map(host => ({host, ports: []}))
+
+      const self = this
+      const pool = new PromisePool(function * () {
+        for (let i = 0; i < hosts.length; i++) {
+          for (let j = 0; j < ports.length; j++) {
+            yield self._checkPort(hosts[i], ports[j], {
+              timeout: self.timeout,
+              protocol: self.protocol
+            })
+          }
+        }
+      }, maxConnections)
+
+      pool.addEventListener('fulfilled', (event) => {
+        let result = results.find(function (value) {
+          return value.host === event.data.result.host
+        })
+
+        result.ports.push({
+          port: event.data.result.port,
+          delta: event.data.result.delta
+        })
+
+        if (portCallback) portCallback(event.data.result)
+      })
+
+      pool.start().then(() => {
+        resolve(results)
+      })
+    })
+  }
+
   _checkPort (host, port, {timeout, protocol} = {}) {
     return new Promise((resolve, reject) => {
       timeout = timeout || 1000
