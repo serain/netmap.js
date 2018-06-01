@@ -18,20 +18,24 @@ export default class NetMap {
       })()
 
       const results = {
-        hosts: []
+        hosts: [],
+        meta: {
+          hosts: hosts,
+          ports: [port],
+          maxConnections: maxConnections,
+          startTime: (new Date()).getTime()
+        }
       }
 
-      this.tcpScan(hosts, [port], {
+      this._scan(hosts, [port], {
         maxConnections: maxConnections,
-        controlPorts: []
+        timeout: this.timeout
       })
-        .then(tcpResults => {
-          results.meta = tcpResults.meta
-
-          for (let i in tcpResults.hosts) {
+        .then(hosts => {
+          for (let i in hosts) {
             const result = {
-              host: tcpResults.hosts[i].host,
-              delta: tcpResults.hosts[i].ports[0].delta,
+              host: hosts[i].host,
+              delta: hosts[i].ports[0].delta,
               live: false
             }
 
@@ -42,6 +46,8 @@ export default class NetMap {
             results.hosts.push(result)
           }
 
+          results.meta.endTime = (new Date()).getTime()
+          results.meta.scanDuration = results.meta.endTime - results.meta.startTime
           resolve(results)
         })
     })

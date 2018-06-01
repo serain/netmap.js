@@ -296,7 +296,7 @@ test('pingSweep() results contain hosts and meta', () => {
   })
 })
 
-test('pingSweep() results have no controlPorts', () => {
+test('pingSweep() meta contains params', () => {
   expect.assertions(1)
 
   const portResults = jest.fn()
@@ -307,7 +307,27 @@ test('pingSweep() results have no controlPorts', () => {
   netmap._checkPort = _ => Promise.resolve(portResults())
 
   return netmap.pingSweep(['192.168.1.1', '192.168.1.2']).then(results => {
-    expect(results.meta.controlPorts).toEqual([])
+    const desiredMeta = {
+      hosts: ['192.168.1.1', '192.168.1.2'],
+      ports: [45000],
+      maxConnections: /17|10/,
+      startTime: expect.any(Number),
+      endTime: expect.any(Number),
+      scanDuration: expect.any(Number)
+    }
+
+    expect(results.meta).toMatchObject(desiredMeta)
+  })
+})
+
+test('pingSweep() timeout parameter works', () => {
+  expect.assertions(2)
+  const netmap = new NetMap({
+    timeout: 10
+  })
+  return netmap.pingSweep(['non-existing-host'], 443).then(results => {
+    expect(results.meta.scanDuration).toBeGreaterThanOrEqual(10)
+    expect(results.meta.scanDuration).toBeLessThan(20)
   })
 })
 
@@ -342,7 +362,7 @@ test('pingSweep() results hosts contain expected parameters', () => {
   })
 })
 
-test('pingSweep() marks hosts that timeout as offline', () => {
+test('pingSweep() marks hosts that timeout as !live', () => {
   expect.assertions(1)
 
   const portResults = jest.fn()
