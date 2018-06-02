@@ -213,8 +213,8 @@ test('tcpScan() meta ports includes controlPorts', () => {
   })
 })
 
-test('tcpScan() hosts contain ports with port, delta and open', () => {
-  expect.assertions(3)
+test('tcpScan() hosts contain ports with port and delta', () => {
+  expect.assertions(2)
 
   const portResults = jest.fn()
   portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
@@ -225,7 +225,6 @@ test('tcpScan() hosts contain ports with port, delta and open', () => {
   return netmap.tcpScan(['192.168.1.1'], [80]).then(results => {
     expect(results.hosts[0].ports[0].port).toBeDefined()
     expect(results.hosts[0].ports[0].delta).toBeDefined()
-    expect(results.hosts[0].ports[0]).toHaveProperty('open')
   })
 })
 

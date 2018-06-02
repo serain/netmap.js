@@ -100,8 +100,7 @@ export default class NetMap {
 
         result.ports.push({
           port: event.data.result.port,
-          delta: event.data.result.delta,
-          open: undefined
+          delta: event.data.result.delta
         })
 
         if (portCallback) portCallback(event.data.result)
