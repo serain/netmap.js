@@ -74,32 +74,35 @@ netmap.tcpScan(hosts, ports).then(results => {
   "hosts": [
     {
       "host": "192.168.1.1",
+      "control": "22",
       "ports": [
-        { "port": 443, "delta": 15 },
-        { "port": 8000, "delta": 19 },
-        { "port": 8080, "delta": 21 },
-        { "port": 27017, "delta": 26 },
-        { "port": 80, "delta": 95 }
+        { "port": 443, "delta": 15, "open": false },
+        { "port": 8000, "delta": 19, "open": false },
+        { "port": 8080, "delta": 21, "open": false },
+        { "port": 27017, "delta": 26, "open": false },
+        { "port": 80, "delta": 95, "open": true }
       ]
     },
     {
       "host": "192.168.99.100",
+      "control": "1001",
       "ports": [
-        { "port": 8080, "delta": 40 },
-        { "port": 80, "delta": 1001 },
-        { "port": 443, "delta": 1000 },
-        { "port": 8000, "delta": 1004 },
-        { "port": 27017, "delta": 1000 }
+        { "port": 8080, "delta": 40, "open": true },
+        { "port": 80, "delta": 1001, "open": false },
+        { "port": 443, "delta": 1000, "open": false },
+        { "port": 8000, "delta": 1004, "open": false },
+        { "port": 27017, "delta": 1000, "open": false }
       ]
     },
     {
       "host": "google.co.uk",
+      "control": "1001",
       "ports": [
-        { "port": 443, "delta": 67 },
-        { "port": 80, "delta": 159 },
-        { "port": 8000, "delta": 1001 },
-        { "port": 8080, "delta": 1002 },
-        { "port": 27017, "delta": 1000 }
+        { "port": 443, "delta": 67, "open": true },
+        { "port": 80, "delta": 159, "open": true },
+        { "port": 8000, "delta": 1001, "open": false },
+        { "port": 8080, "delta": 1002, "open": false },
+        { "port": 27017, "delta": 1000, "open": false }
       ]
     }
   ],
@@ -107,13 +110,13 @@ netmap.tcpScan(hosts, ports).then(results => {
 }
 ```
 
-You'll notice that `netmap.js` doesn't try to tell us if a port is open or closed (yet). Rather it returns the time in milliseconds (`delta`) the browser took to throw an error when trying to connect to the port. The default timeout is 1000 milliseconds.
-
 At first the results may seem contradictory.
 
 `192.168.1.1` is an embedded Linux machine (a router) on the local network segment, and the only port open is `80`. We can see that it took the browser about 5 times longer to error out on `80` compared to the other, closed, ports.
 
-`192.168.99.100` is a host-only VM with port `8080` open and `google.co.uk` is an external host with both `443` and `80` open. In this case the browser threw an error relatively rapidly on the open ports while the closed ports simply timed out. The [Theory](#theory) section further down explains when this happens.
+`192.168.99.100` is a host-only VM with port `8080` open and `google.co.uk` is an external host with both `443` and `80` open. In these cases the browser threw an error relatively rapidly on the open ports while the closed ports simply timed out. The [Theory](#theory) section further down explains when this happens.
+
+In order to determine if ports should be tagged as open or closed, `netmap.js` will scan a "control" port (by default `45000`) that is assumed to be closed. The `control` time is then used to determine the status of other ports. If the ratio `delta/control` is greater than a set value (default `0.8`), the port is assumed to be closed (tl;dr: a difference of more that 20% from the control time means the port is open).
 
 ## Limitations
 
@@ -201,6 +204,8 @@ The method takes the following parameters:
 * `options` object with:
   * `maxConnections` - the maximum number of concurrent connections (by default `6` - the maximum connections per domain browsers will allow)
   * `portCallback` - a callback to execute when an individual `host:port` combination has finished scanning
+  * `controlPort` - the port to scan to determine a baseline closed-port delta (default `45000`)
+  * `controlRatio` - the similarity, in percentage, from the control delta for a port to be considered closed (default `0.8`, see [example](#scan-tcp-ports))
 
 It returns a promise.
 
@@ -209,7 +214,9 @@ netmap.tcpScan(['192.168.1.1'], [80, 27017], {
   maxConnections: 5,
   portCallback: result => {
     console.log(result)
-  }
+  },
+  controlPort: 45000,
+  controlRatio: 0.8
 }).then(results => {
   console.log(results)
 })
