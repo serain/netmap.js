@@ -21,7 +21,7 @@ Turns out there wasn't a decent ready-to-use `npm` module and the [`port_scanner
 ### Install
 
 ```shell
-npm install --save-dev netmap.js
+npm install --save netmap.js
 ```
 
 ### Find Live Hosts
