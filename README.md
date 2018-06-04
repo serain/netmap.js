@@ -42,10 +42,10 @@ netmap.pingSweep(hosts).then(results => {
 ```json
 {
   "hosts": [
-    { "host": "192.168.0.1", "delta": 2003, "live": false },
-    { "host": "192.168.0.254", "delta": 2001, "live": false },
+    { "host": "192.168.0.1", "delta": 1003, "live": false },
+    { "host": "192.168.0.254", "delta": 1001, "live": false },
     { "host": "192.168.1.1", "delta": 18, "live": true },
-    { "host": "192.168.1.254", "delta": 2002, "live": false }
+    { "host": "192.168.1.254", "delta": 1002, "live": false }
   ],
   "meta": {}
 }
