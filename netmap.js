@@ -60,7 +60,6 @@ export default class NetMap {
       // which may not be up-to-date or accurate
       maxConnections = maxConnections || 6
       controlPorts = controlPorts || [45000, 45001, 45002]
-      ports = ports.concat(controlPorts)
 
       const results = {
         meta: {

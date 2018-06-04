@@ -197,22 +197,6 @@ test('tcpScan() meta has user defined controlPorts', () => {
   })
 })
 
-test('tcpScan() meta ports includes controlPorts', () => {
-  expect.assertions(1)
-
-  const portResults = jest.fn()
-  portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
-
-  const netmap = new NetMap({timeout: 1})
-  netmap._checkPort = _ => Promise.resolve(portResults())
-
-  return netmap.tcpScan(['192.168.1.1'], [80], {
-    controlPorts: [10000, 10001]
-  }).then(results => {
-    expect(results.meta.ports).toEqual([80, 10000, 10001])
-  })
-})
-
 test('tcpScan() hosts contain ports with port and delta', () => {
   expect.assertions(2)
 
