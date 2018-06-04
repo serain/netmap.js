@@ -61,6 +61,7 @@ export default class NetMap {
       maxConnections = maxConnections || 6
       controlPorts = controlPorts || [45000, 45001, 45002]
       ports = ports.concat(controlPorts)
+
       const results = {
         meta: {
           hosts: hosts,
@@ -68,49 +69,21 @@ export default class NetMap {
           maxConnections: maxConnections,
           controlPorts: controlPorts,
           startTime: (new Date()).getTime()
-        },
-        hosts: (function () {
-          const hostsResults = []
-          hosts.forEach(function (host) {
-            hostsResults.push({
-              host: host,
-              ports: []
-            })
-          })
-          return hostsResults
-        })()
+        }
       }
 
-      const self = this
-      const pool = new PromisePool(function * () {
-        for (let i = 0; i < hosts.length; i++) {
-          for (let j = 0; j < ports.length; j++) {
-            yield self._checkPort(hosts[i], ports[j], {
-              timeout: self.timeout,
-              protocol: self.protocol
-            })
-          }
-        }
-      }, maxConnections)
-
-      pool.addEventListener('fulfilled', (event) => {
-        let result = results.hosts.find(function (value) {
-          return value.host === event.data.result.host
-        })
-
-        result.ports.push({
-          port: event.data.result.port,
-          delta: event.data.result.delta
-        })
-
-        if (portCallback) portCallback(event.data.result)
+      this._scan(hosts, ports, {
+        maxConnections: maxConnections,
+        timeout: this.timeout,
+        portCallback: portCallback
       })
+        .then(hosts => {
+          results.hosts = hosts
 
-      pool.start().then(() => {
-        results.meta.endTime = (new Date()).getTime()
-        results.meta.scanDuration = results.meta.endTime - results.meta.startTime
-        resolve(results)
-      })
+          results.meta.endTime = (new Date()).getTime()
+          results.meta.scanDuration = results.meta.endTime - results.meta.startTime
+          resolve(results)
+        })
     })
   }
 
