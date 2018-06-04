@@ -31,11 +31,11 @@ export default class NetMap {
         maxConnections: maxConnections,
         timeout: this.timeout
       })
-        .then(hosts => {
-          for (let i in hosts) {
+        .then(scanResults => {
+          for (let i in scanResults) {
             const result = {
-              host: hosts[i].host,
-              delta: hosts[i].ports[0].delta,
+              host: scanResults[i].host,
+              delta: scanResults[i].ports[0].delta,
               live: false
             }
 
@@ -53,31 +53,50 @@ export default class NetMap {
     })
   }
 
-  tcpScan (hosts, ports, {portCallback, maxConnections, controlPorts} = {}) {
+  tcpScan (hosts, ports, {portCallback, maxConnections, controlPort} = {}) {
     return new Promise((resolve, reject) => {
       // best estimate for maxConnections based on
       // https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser
       // which may not be up-to-date or accurate
       maxConnections = maxConnections || 6
-      controlPorts = controlPorts || [45000, 45001, 45002]
+      controlPort = controlPort || 45000
 
       const results = {
         meta: {
           hosts: hosts,
           ports: ports,
           maxConnections: maxConnections,
-          controlPorts: controlPorts,
+          controlPort: controlPort,
           startTime: (new Date()).getTime()
         }
       }
 
+      // main port scan
       this._scan(hosts, ports, {
         maxConnections: maxConnections,
         timeout: this.timeout,
         portCallback: portCallback
       })
-        .then(hosts => {
-          results.hosts = hosts
+        .then(scanResults => {
+          results.hosts = scanResults
+          return this.pingSweep(hosts, {port: controlPort})
+        })
+        .then(controlResults => {
+          for (let i in controlResults.hosts) {
+            let result = results.hosts.find(function (value) {
+              return value.host === controlResults.hosts[i].host
+            })
+            result.control = controlResults.hosts[i].delta
+
+            for (let j in result.ports) {
+              let ratio = Math.min(result.ports[j].delta, result.control) / Math.max(result.ports[j].delta, result.control)
+              if (ratio > 0.8) {
+                result.ports[j].open = false
+              } else {
+                result.ports[j].open = true
+              }
+            }
+          }
 
           results.meta.endTime = (new Date()).getTime()
           results.meta.scanDuration = results.meta.endTime - results.meta.startTime

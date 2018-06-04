@@ -154,6 +154,9 @@ test('tcpScan() results contain meta, hosts and ports', () => {
   portResults.mockReturnValueOnce({host: '192.168.1.2', port: 80, delta: 1})
   portResults.mockReturnValueOnce({host: '192.168.1.2', port: 443, delta: 1})
   portResults.mockReturnValueOnce({host: '192.168.1.2', port: 8080, delta: 1})
+  // control port results
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 45000, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.2', port: 45000, delta: 1})
 
   const netmap = new NetMap({timeout: 1})
   netmap._checkPort = _ => Promise.resolve(portResults())
@@ -167,7 +170,7 @@ test('tcpScan() results contain meta, hosts and ports', () => {
   })
 })
 
-test('tcpScan() meta has default controlPorts', () => {
+test('tcpScan() meta has default controlPort', () => {
   expect.assertions(1)
 
   const portResults = jest.fn()
@@ -177,11 +180,11 @@ test('tcpScan() meta has default controlPorts', () => {
   netmap._checkPort = _ => Promise.resolve(portResults())
 
   return netmap.tcpScan(['192.168.1.1'], [80]).then(results => {
-    expect(results.meta.controlPorts).toEqual([45000, 45001, 45002])
+    expect(results.meta.controlPort).toEqual(45000)
   })
 })
 
-test('tcpScan() meta has user defined controlPorts', () => {
+test('tcpScan() meta has user defined controlPort', () => {
   expect.assertions(1)
 
   const portResults = jest.fn()
@@ -191,14 +194,28 @@ test('tcpScan() meta has user defined controlPorts', () => {
   netmap._checkPort = _ => Promise.resolve(portResults())
 
   return netmap.tcpScan(['192.168.1.1'], [80], {
-    controlPorts: [10000, 10001]
+    controlPort: 10000
   }).then(results => {
-    expect(results.meta.controlPorts).toEqual([10000, 10001])
+    expect(results.meta.controlPort).toEqual(10000)
   })
 })
 
-test('tcpScan() hosts contain ports with port and delta', () => {
-  expect.assertions(2)
+test('tcpScan() hosts contain control value', () => {
+  expect.assertions(1)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
+
+  const netmap = new NetMap({timeout: 1})
+  netmap._checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.tcpScan(['192.168.1.1'], [80]).then(results => {
+    expect(results.hosts[0].control).toBeDefined()
+  })
+})
+
+test('tcpScan() hosts contain ports with port, delta and open', () => {
+  expect.assertions(3)
 
   const portResults = jest.fn()
   portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
@@ -209,6 +226,31 @@ test('tcpScan() hosts contain ports with port and delta', () => {
   return netmap.tcpScan(['192.168.1.1'], [80]).then(results => {
     expect(results.hosts[0].ports[0].port).toBeDefined()
     expect(results.hosts[0].ports[0].delta).toBeDefined()
+    expect(results.hosts[0].ports[0].open).toBeDefined()
+  })
+})
+
+test('tcpScan() hosts correctly marks ports as open and closed', () => {
+  expect.assertions(2)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 443, delta: 10})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 45000, delta: 10})
+
+  const netmap = new NetMap({timeout: 1})
+  netmap._checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.tcpScan(['192.168.1.1'], [80, 443], {
+    controlPort: 45000
+  }).then(results => {
+    for (let i in results.hosts[0].ports) {
+      if (results.hosts[0].ports[i].port === 443) {
+        expect(results.hosts[0].ports[i].open).toEqual(false)
+      } else if (results.hosts[0].ports[i].port === 80) {
+        expect(results.hosts[0].ports[i].open).toEqual(true)
+      }
+    }
   })
 })
 
@@ -222,11 +264,10 @@ test('tcpScan() portCallback() is called', () => {
   const portCallback = jest.fn()
   netmap._checkPort = _ => Promise.resolve(portResults())
 
-  return netmap.tcpScan(['192.168.1.1', '192.168.1.2'], [80, 443, 8080], {
-    portCallback: portCallback,
-    controlPorts: []
+  return netmap.tcpScan(['192.168.1.1'], [80, 443], {
+    portCallback: portCallback
   }).then(results => {
-    expect(portCallback.mock.calls.length).toEqual(6)
+    expect(portCallback.mock.calls.length).toEqual(2)
   })
 })
 
@@ -234,16 +275,14 @@ test('tcpScan() - portCallback() result parameter has expected values', () => {
   expect.assertions(2)
 
   const portResults = jest.fn()
-  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
-  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 443, delta: 1})
+  portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
 
   const netmap = new NetMap({timeout: 1})
   const portCallback = jest.fn()
   netmap._checkPort = _ => Promise.resolve(portResults())
 
   return netmap.tcpScan(['192.168.1.1'], [80, 443], {
-    portCallback: portCallback,
-    controlPorts: []
+    portCallback: portCallback
   }).then(results => {
     const desiredResult = {
       host: '192.168.1.1',
