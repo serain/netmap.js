@@ -170,8 +170,8 @@ test('tcpScan() results contain meta, hosts and ports', () => {
   })
 })
 
-test('tcpScan() meta has default controlPort', () => {
-  expect.assertions(1)
+test('tcpScan() meta has default controlPort and controlRatio', () => {
+  expect.assertions(2)
 
   const portResults = jest.fn()
   portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
@@ -181,11 +181,12 @@ test('tcpScan() meta has default controlPort', () => {
 
   return netmap.tcpScan(['192.168.1.1'], [80]).then(results => {
     expect(results.meta.controlPort).toEqual(45000)
+    expect(results.meta.controlRatio).toEqual(0.8)
   })
 })
 
-test('tcpScan() meta has user defined controlPort', () => {
-  expect.assertions(1)
+test('tcpScan() meta has user defined controlPort and controlRatio', () => {
+  expect.assertions(2)
 
   const portResults = jest.fn()
   portResults.mockReturnValue({host: '192.168.1.1', port: 80, delta: 1})
@@ -194,9 +195,11 @@ test('tcpScan() meta has user defined controlPort', () => {
   netmap._checkPort = _ => Promise.resolve(portResults())
 
   return netmap.tcpScan(['192.168.1.1'], [80], {
-    controlPort: 10000
+    controlPort: 10000,
+    controlRatio: 0.5
   }).then(results => {
     expect(results.meta.controlPort).toEqual(10000)
+    expect(results.meta.controlRatio).toEqual(0.5)
   })
 })
 
@@ -230,25 +233,64 @@ test('tcpScan() hosts contain ports with port, delta and open', () => {
   })
 })
 
-test('tcpScan() hosts correctly marks ports as open and closed', () => {
-  expect.assertions(2)
+test('tcpScan() hosts correctly marks ports as open and closed with default controlRatio', () => {
+  expect.assertions(3)
 
   const portResults = jest.fn()
   portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
-  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 443, delta: 10})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 443, delta: 6})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 8080, delta: 10})
   portResults.mockReturnValueOnce({host: '192.168.1.1', port: 45000, delta: 10})
 
   const netmap = new NetMap({timeout: 1})
   netmap._checkPort = _ => Promise.resolve(portResults())
 
-  return netmap.tcpScan(['192.168.1.1'], [80, 443], {
+  return netmap.tcpScan(['192.168.1.1'], [80, 443, 8080], {
     controlPort: 45000
   }).then(results => {
     for (let i in results.hosts[0].ports) {
-      if (results.hosts[0].ports[i].port === 443) {
-        expect(results.hosts[0].ports[i].open).toEqual(false)
-      } else if (results.hosts[0].ports[i].port === 80) {
-        expect(results.hosts[0].ports[i].open).toEqual(true)
+      switch (results.hosts[0].ports[i].port) {
+        case 80:
+          expect(results.hosts[0].ports[i].open).toEqual(true)
+          break
+        case 443:
+          expect(results.hosts[0].ports[i].open).toEqual(true)
+          break
+        case 8080:
+          expect(results.hosts[0].ports[i].open).toEqual(false)
+          break
+      }
+    }
+  })
+})
+
+test('tcpScan() hosts correctly marks ports as open and closed with user-defined controlRatio', () => {
+  expect.assertions(3)
+
+  const portResults = jest.fn()
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 80, delta: 1})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 443, delta: 6})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 8080, delta: 10})
+  portResults.mockReturnValueOnce({host: '192.168.1.1', port: 45000, delta: 10})
+
+  const netmap = new NetMap({timeout: 1})
+  netmap._checkPort = _ => Promise.resolve(portResults())
+
+  return netmap.tcpScan(['192.168.1.1'], [80, 443, 8080], {
+    controlPort: 45000,
+    controlRatio: 0.5
+  }).then(results => {
+    for (let i in results.hosts[0].ports) {
+      switch (results.hosts[0].ports[i].port) {
+        case 80:
+          expect(results.hosts[0].ports[i].open).toEqual(true)
+          break
+        case 443:
+          expect(results.hosts[0].ports[i].open).toEqual(false)
+          break
+        case 8080:
+          expect(results.hosts[0].ports[i].open).toEqual(false)
+          break
       }
     }
   })

@@ -53,13 +53,14 @@ export default class NetMap {
     })
   }
 
-  tcpScan (hosts, ports, {portCallback, maxConnections, controlPort} = {}) {
+  tcpScan (hosts, ports, {portCallback, maxConnections, controlPort, controlRatio} = {}) {
     return new Promise((resolve, reject) => {
       // best estimate for maxConnections based on
       // https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser
       // which may not be up-to-date or accurate
       maxConnections = maxConnections || 6
       controlPort = controlPort || 45000
+      controlRatio = controlRatio || 0.8
 
       const results = {
         meta: {
@@ -67,6 +68,7 @@ export default class NetMap {
           ports: ports,
           maxConnections: maxConnections,
           controlPort: controlPort,
+          controlRatio: controlRatio,
           startTime: (new Date()).getTime()
         }
       }
@@ -90,7 +92,7 @@ export default class NetMap {
 
             for (let j in result.ports) {
               let ratio = Math.min(result.ports[j].delta, result.control) / Math.max(result.ports[j].delta, result.control)
-              if (ratio > 0.8) {
+              if (ratio > controlRatio) {
                 result.ports[j].open = false
               } else {
                 result.ports[j].open = true
