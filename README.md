@@ -200,7 +200,6 @@ The method takes the following parameters:
 
 * `hosts` array of hosts to scan (IP addresses or host names)
 * `ports` list of ports to scan (integers between 1-65535, avoid ports in the [blacklists](#port-blacklists))
-* `callback(results)` to execute on completion
 * `options` object with:
   * `maxConnections` - the maximum number of concurrent connections (by default `6` - the maximum connections per domain browsers will allow)
   * `portCallback` - a callback to execute when an individual `host:port` combination has finished scanning
