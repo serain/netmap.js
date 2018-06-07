@@ -130,9 +130,9 @@ You can check the blacklists from these sources:
 * [Mozilla docs](https://developer.mozilla.org/en-US/docs/Mozilla/Mozilla_Port_Blocking)
 * Edge/IE (send me a link if you find a source)
 
-It's possible to get around this limitation on Firefox (and maybe others) by using the `ftp` protocol instead of `http` to establish connections. You can specify the `protocol` in the options object when instantiating `NetMap`. When using `ftp` you should expect open ports to time out and closed ports to error out relatively rapidly. `ftp` scanning is also subject to the limitations around TCP `RST` packets discussed in this document.
+Before [Firefox 61](https://blog.mozilla.org/security/2018/05/07/blocking-ftp-subresource-loads-within-non-ftp-documents-in-firefox-61/) (and maybe other browsers), it's possible to get around this limitation by using the `ftp` protocol instead of `http` to establish connections. You can specify the `protocol` in the options object when instantiating `NetMap`. When using `ftp` you should expect open ports to time out and closed ports to error out relatively rapidly. `ftp` scanning is also subject to the limitations around TCP `RST` packets discussed in this document.
 
-Sub-resource requests from "legacy" protocols like `ftp` are blocked in Chromium.
+Sub-resource requests from "legacy" protocols like `ftp` have been blocked for a while in Chromium.
 
 ### "Ping" Sweep
 
