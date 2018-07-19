@@ -29,7 +29,7 @@ npm install --save netmap.js
 Let's figure out the IP address of a website visitor's gateway, starting from a list of likely candidates in a home environment:
 
 ```javascript
-import NetMap from 'netmap'
+import NetMap from 'netmap.js'
 
 const netmap = new NetMap()
 const hosts = ['192.168.0.1', '192.168.0.254', '192.168.1.1', '192.168.1.254']
@@ -58,7 +58,7 @@ Host `192.168.1.1` appears to be live.
 Let's try to find some open TCP ports on a few hosts:
 
 ```javascript
-import NetMap from 'netmap'
+import NetMap from 'netmap.js'
 
 const netmap = new NetMap()
 const hosts = ['192.168.1.1', '192.168.99.100', 'google.co.uk']
@@ -162,7 +162,7 @@ The `NetMap` constructor takes an options object that allows you to configure:
 * The port connection `timeout` (default `1000` milliseconds)
 
 ```javascript
-import NetMap from 'netmap'
+import NetMap from 'netmap.js'
 
 const netmap = new NetMap({
   protocol: 'http',
