@@ -2,6 +2,8 @@
 
 Fast browser-based network discovery module
 
+This project is no longer maintained.
+
 ## Description
 
 `netmap.js` provides browser-based host discovery and port scanning capabilities to allow you to map website visitors' networks.
